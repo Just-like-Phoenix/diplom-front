@@ -7,6 +7,7 @@ import Router from "routes/Router";
 function App() {
   const theme = createTheme(getDesignTokens(useThemeChecker() as PaletteMode));
 
+  console.log(theme);
   return (
     <ThemeProvider theme={theme}>
       <Global
@@ -26,8 +27,8 @@ function App() {
           input:-webkit-autofill:hover,
           input:-webkit-autofill:focus,
           input:-webkit-autofill:active {
-            -webkit-box-shadow: 0 0 0 1px
-              ${theme.palette.mode === "dark" ? "#26463794" : "#fff"} inset !important;
+            -webkit-box-shadow: 0 0 0 30px
+              ${theme.palette.mode === "dark" ? "#272727" : "#fff"} inset !important;
           }
         `}
       />

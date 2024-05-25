@@ -31,4 +31,10 @@ export const getDesignTokens = (mode: PaletteMode) => ({
           },
         }),
   },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: `
+      `,
+    },
+  },
 });

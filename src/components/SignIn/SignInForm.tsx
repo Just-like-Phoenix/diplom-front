@@ -30,15 +30,26 @@ const SignInForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({ mode: "all" });
   const navigate = useNavigate();
-  const [sendRequest, { isSuccess, isLoading }] = useSignInMutation();
+  const [sendRequest, { isSuccess, isLoading, data, originalArgs }] =
+    useSignInMutation();
 
   const onSubmit = (data: SignInRequest) => sendRequest(data);
 
   if (isLoading) return <CircleBackdropLoader open={isLoading} />;
 
-  if (isSuccess) navigate("/");
+  if (isSuccess) {
+    if (data != null) {
+      localStorage.setItem("type", data.type);
+      localStorage.setItem("token", data.token);
+    }
+    if (originalArgs != null) {
+      localStorage.setItem("email", originalArgs.email);
+    }
+
+    navigate("/");
+  }
 
   return (
     <Card elevation={4} sx={{ width: 360, margin: 2 }}>
@@ -71,7 +82,15 @@ const SignInForm = () => {
               type={showPassword ? "text" : "password"}
               {...register("password", {
                 required: { value: true, message: "Ввeдите пароль!" },
-                minLength: { value: 8, message: "Ввeдите пароль!" },
+                minLength: {
+                  value: 8,
+                  message: "Пароль меньше 8 символов!",
+                },
+                pattern: {
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
+                  message:
+                    "Пароль должен содержать цифры, латинские прописные и строчные буквы",
+                },
               })}
               endAdornment={
                 <InputAdornment position="end">

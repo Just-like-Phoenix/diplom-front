@@ -107,7 +107,7 @@ const SignUpForm = () => {
                   pattern: {
                     value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
                     message:
-                      "Пароль должен содержать спец символ, цифры, прописные и строчные буквы",
+                      "Пароль должен содержать цифры, латинские прописные и строчные буквы",
                   },
                 })}
               />
@@ -143,6 +143,7 @@ const SignUpForm = () => {
             <Button
               variant="contained"
               sx={{ display: formStep === 1 ? "flex" : "none" }}
+              disabled={!isValid}
               type="submit"
             >
               Зарегистрироватся
