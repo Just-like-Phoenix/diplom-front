@@ -3,11 +3,12 @@ import { getDesignTokens } from "./theme";
 import { useThemeChecker } from "hooks/useThemeChecker";
 import { Global, css } from "@emotion/react";
 import Router from "routes/Router";
+import { ruRU as coreRuRU } from "@mui/material/locale";
+import { ruRU } from "@mui/x-data-grid/locales";
 
 function App() {
-  const theme = createTheme(getDesignTokens(useThemeChecker() as PaletteMode));
+  const theme = createTheme(getDesignTokens(useThemeChecker() as PaletteMode), ruRU, coreRuRU);
 
-  console.log(theme);
   return (
     <ThemeProvider theme={theme}>
       <Global
@@ -27,8 +28,7 @@ function App() {
           input:-webkit-autofill:hover,
           input:-webkit-autofill:focus,
           input:-webkit-autofill:active {
-            -webkit-box-shadow: 0 0 0 30px
-              ${theme.palette.mode === "dark" ? "#272727" : "#fff"} inset !important;
+            -webkit-box-shadow: 0 0 0 30px ${theme.palette.mode === "dark" ? "#272727" : "#fff"} inset !important;
           }
         `}
       />

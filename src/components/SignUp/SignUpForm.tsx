@@ -1,6 +1,6 @@
 import { Button, Card, Stack, TextField, Typography } from "@mui/material";
 import CircleBackdropLoader from "components/Loaders/CircleBackdropLoader";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useSignUpMutation } from "services/api/authorization.service";
@@ -28,9 +28,11 @@ const SignUpForm = () => {
 
   const onSubmit = (data: SignUpRequest) => sendRequest(data);
 
-  if (isLoading) return <CircleBackdropLoader open={isLoading} />;
+  useEffect(() => {
+    if (isSuccess) navigate("/");
+  }, [isSuccess]);
 
-  if (isSuccess) navigate("/");
+  if (isLoading) return <CircleBackdropLoader open={isLoading} />;
 
   return (
     <Card elevation={4} sx={{ width: 360, margin: 2 }}>
@@ -106,8 +108,7 @@ const SignUpForm = () => {
                   },
                   pattern: {
                     value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
-                    message:
-                      "Пароль должен содержать цифры, латинские прописные и строчные буквы",
+                    message: "Пароль должен содержать цифры, латинские прописные и строчные буквы",
                   },
                 })}
               />
@@ -119,19 +120,13 @@ const SignUpForm = () => {
                 helperText={errors.passwordConfirm?.message}
                 {...register("passwordConfirm", {
                   required: { value: true, message: "Ввeдите пароль!" },
-                  validate: (value) =>
-                    value === watch("password") || "Пароль не совподает!",
+                  validate: (value) => value === watch("password") || "Пароль не совподает!",
                 })}
               />
             </Stack>
           )}
 
-          <Stack
-            spacing={2}
-            direction={"row"}
-            alignItems={"center"}
-            justifyContent={"end"}
-          >
+          <Stack spacing={2} direction={"row"} alignItems={"center"} justifyContent={"end"}>
             <Button
               variant="contained"
               sx={{ display: formStep === 0 ? "flex" : "none" }}
@@ -140,12 +135,7 @@ const SignUpForm = () => {
             >
               Далее
             </Button>
-            <Button
-              variant="contained"
-              sx={{ display: formStep === 1 ? "flex" : "none" }}
-              disabled={!isValid}
-              type="submit"
-            >
+            <Button variant="contained" sx={{ display: formStep === 1 ? "flex" : "none" }} disabled={!isValid} type="submit">
               Зарегистрироватся
             </Button>
           </Stack>

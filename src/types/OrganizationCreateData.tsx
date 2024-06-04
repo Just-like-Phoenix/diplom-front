@@ -4,4 +4,5 @@ export interface OrganizationCreateData {
   orgName: string;
   orgEmail: string;
   orgAddress: string;
+  orgRegion: string;
 }

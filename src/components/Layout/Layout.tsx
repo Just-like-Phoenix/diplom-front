@@ -1,7 +1,6 @@
 import { AppBar, Box, Stack, Toolbar } from "@mui/material";
-import AppHeader from "components/Layout/AppHeader";
-import AppDrawer from "components/Layout/AppDrawer";
-import React from "react";
+import AppDrawer from "components/Drawer/AppDrawer";
+import AppHeader from "components/Header/AppHeader";
 import { Outlet } from "react-router-dom";
 
 const Layout = () => {
@@ -11,7 +10,7 @@ const Layout = () => {
       <Toolbar />
       <Stack display={"flex"} direction={"row"}>
         <AppDrawer />
-        <Box padding={1}>
+        <Box width={"100%"}>
           <Outlet />
         </Box>
       </Stack>

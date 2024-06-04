@@ -14,15 +14,15 @@ import {
 import { useSignInMutation } from "services/api/authorization.service";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { SignInRequest } from "types/SignInData";
+import { SignInData } from "types/SignInData";
 import CircleBackdropLoader from "components/Loaders/CircleBackdropLoader";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-
-interface FormData {
-  email: string;
-  password: string;
-}
+import { setCookie } from "typescript-cookie";
+import { jwtDecode } from "jwt-decode";
+import { JwtCustomPayload } from "types/JwtCustomPayload";
+import { QueryStatus } from "@reduxjs/toolkit/query";
+import { enqueueSnackbar } from "notistack";
 
 const SignInForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,26 +30,29 @@ const SignInForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({ mode: "all" });
+  } = useForm<SignInData>({ mode: "all" });
   const navigate = useNavigate();
-  const [sendRequest, { isSuccess, isLoading, data, originalArgs }] =
-    useSignInMutation();
+  const [sendRequest, { isSuccess, isLoading, data, status }] = useSignInMutation();
+  const onSubmit = (data: SignInData) => {
+    sendRequest(data);
+  };
 
-  const onSubmit = (data: SignInRequest) => sendRequest(data);
+  useEffect(() => {
+    if (isSuccess && data) {
+      const decoded = jwtDecode(data.token) as JwtCustomPayload;
+      setCookie("type", data.type, { expires: 30, path: "" });
+      setCookie("token", data.token, { expires: 30, path: "" });
+      setCookie("email", decoded.email, { expires: 30, path: "" });
+      setCookie("userId", decoded.nameid, { expires: 30, path: "" });
+      setCookie(`role`, decoded.role.toString(), { expires: 30, path: "" });
+      setCookie("isSignin", true, { expires: 30, path: "" });
+      navigate("/");
+    }
+  }, [isSuccess, data]);
 
   if (isLoading) return <CircleBackdropLoader open={isLoading} />;
 
-  if (isSuccess) {
-    if (data != null) {
-      localStorage.setItem("type", data.type);
-      localStorage.setItem("token", data.token);
-    }
-    if (originalArgs != null) {
-      localStorage.setItem("email", originalArgs.email);
-    }
-
-    navigate("/");
-  }
+  if (status == QueryStatus.rejected) enqueueSnackbar("Не удолось войти!", { variant: "error" });
 
   return (
     <Card elevation={4} sx={{ width: 360, margin: 2 }}>
@@ -74,9 +77,7 @@ const SignInForm = () => {
             })}
           />
           <FormControl variant="outlined" error={!!errors.password}>
-            <InputLabel htmlFor="outlined-adornment-password">
-              Пароль
-            </InputLabel>
+            <InputLabel htmlFor="outlined-adornment-password">Пароль</InputLabel>
             <OutlinedInput
               id="outlined-adornment-password"
               type={showPassword ? "text" : "password"}
@@ -88,8 +89,7 @@ const SignInForm = () => {
                 },
                 pattern: {
                   value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
-                  message:
-                    "Пароль должен содержать цифры, латинские прописные и строчные буквы",
+                  message: "Пароль должен содержать цифры, латинские прописные и строчные буквы",
                 },
               })}
               endAdornment={
@@ -110,12 +110,7 @@ const SignInForm = () => {
             />
             <FormHelperText>{errors.password?.message}</FormHelperText>
           </FormControl>
-          <Stack
-            spacing={2}
-            direction={"row"}
-            alignItems={"center"}
-            justifyContent={"space-between"}
-          >
+          <Stack spacing={2} direction={"row"} alignItems={"center"} justifyContent={"space-between"}>
             <Button variant="text" onClick={(e) => navigate("/signup")}>
               Создать аккаунт
             </Button>
